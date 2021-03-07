@@ -1,0 +1,20 @@
+.score {
+  font-family: Arial, Helvetica, sans-serif;
+  fill: #0095dd;
+}
+
+.brick {
+  background-color: #0095dd;
+}
+
+.paddle {
+  background-color: #0095dd;
+}
+
+canvas {
+  background: green;
+}
+
+.game-header {
+  padding-left: 75px;
+}

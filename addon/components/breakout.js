@@ -48,24 +48,25 @@ export default class BreakoutComponent extends Component {
 
     this.x = this.canvas.width / 2;
     this.y = this.canvas.height - 30;
-    this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
 
+    // paddle
+    this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+    this.drawPaddle(this.ctx, this.paddleWidth, this.paddleHeight);
+
+    // bricks
     this.createBricks();
     this.drawBricks();
 
-    // this.createBricks(5, 3);
-    // this.drawBricks(this.bricks, 5, 3);
-    this.drawPaddle();
-
+    // event listeners
     document.addEventListener('keydown', this.keyDownHandler.bind(this), false);
     document.addEventListener('keyup', this.keyUpHandler.bind(this), false);
-    document.addEventListener(
-      'mousemove',
-      this.mouseMoveHandler.bind(this),
-      false
-    );
+    // prettier-ignore
+    document.addEventListener('mousemove', this.mouseMoveHandler.bind(this), false);
   }
 
+  /**
+   * Glimmer component lifecycle hook
+   */
   willDestroy() {
     super.willDestroy(...arguments);
     document.removeEventListener('keydown', this.keyDownHandler);
@@ -73,6 +74,9 @@ export default class BreakoutComponent extends Component {
     document.removeEventListener('mousemove', this.mouseMoveHandler);
   }
 
+  /**
+   * Initializes the bricks array
+   */
   createBricks() {
     for (let row = 0; row < this.brickRowCount; row++) {
       this.bricks[row] = [];
@@ -82,7 +86,13 @@ export default class BreakoutComponent extends Component {
     }
   }
 
-  // keydown event listener
+  // ****** Event listners for game play ******
+
+  /**
+   * Keydown event listener
+   * 
+   * @param  {Object} e Event object
+   */
   keyDownHandler(e) {
     if (e.code == 'ArrowRight') {
       this.rightPressed = true;
@@ -91,7 +101,11 @@ export default class BreakoutComponent extends Component {
     }
   }
 
-  // keyup event handler
+  /**
+   * keyup event handler
+   * 
+   * @param  {Object} e Event object
+   */
   keyUpHandler(e) {
     if (e.code == 'ArrowRight') {
       this.rightPressed = false;
@@ -100,7 +114,11 @@ export default class BreakoutComponent extends Component {
     }
   }
 
-  // mouse move
+  /**
+   * mouse move event handler
+   * 
+    * @param  {Object} e Event object
+   */
   mouseMoveHandler(e) {
     const relativeX = e.clientX - this.canvas.offsetLeft;
     if (relativeX > 0 && relativeX < this.canvas.width) {
@@ -108,6 +126,9 @@ export default class BreakoutComponent extends Component {
     }
   }
 
+  /**
+   * Detects when the ball strikes a brick and adjusts the score
+   */
   collisionDetection() {
     for (let row = 0; row < this.brickRowCount; row++) {
       for (let col = 0; col < this.brickColumnCount; col++) {
@@ -135,6 +156,11 @@ export default class BreakoutComponent extends Component {
     }
   }
 
+  // ****** Game elements ******
+
+  /**
+   * Draw the game ball
+   */
   drawBall(radius) {
     this.ctx.beginPath();
     this.ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
@@ -143,6 +169,9 @@ export default class BreakoutComponent extends Component {
     this.ctx.closePath();
   }
 
+  /**
+   * Draw the game paddle
+   */
   drawPaddle() {
     this.ctx.beginPath();
     this.ctx.rect(
@@ -156,6 +185,9 @@ export default class BreakoutComponent extends Component {
     this.ctx.closePath();
   }
 
+  /**
+   * Draw the field of bricks
+   */
   drawBricks() {
     for (let row = 0; row < this.brickRowCount; row++) {
       for (let col = 0; col < this.brickColumnCount; col++) {
@@ -177,6 +209,9 @@ export default class BreakoutComponent extends Component {
   }
 
   @action
+  /**
+   * Start playing the game
+   */
   newGame() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawBricks();

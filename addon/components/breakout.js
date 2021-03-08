@@ -83,12 +83,12 @@ export default class BreakoutComponent extends Component {
 
   /**
    * Initializes the bricks array
-   * 
+   *
    * @param  {!Array} bricks this.bricks
    * @param  {!Number} rows Number of brick rows
    * @param  {!Number} cols Number of brick columns
    */
-   createBricks(bricks, rows, cols) {
+  createBricks(bricks, rows, cols) {
     for (let row = 0; row < rows; row++) {
       bricks[row] = [];
       for (let col = 0; col < cols; col++) {
@@ -101,7 +101,7 @@ export default class BreakoutComponent extends Component {
 
   /**
    * Keydown event listener
-   * 
+   *
    * @param  {Object} e Event object
    */
   keyDownHandler(e) {
@@ -114,7 +114,7 @@ export default class BreakoutComponent extends Component {
 
   /**
    * keyup event handler
-   * 
+   *
    * @param  {Object} e Event object
    */
   keyUpHandler(e) {
@@ -127,8 +127,8 @@ export default class BreakoutComponent extends Component {
 
   /**
    * mouse move event handler
-   * 
-    * @param  {Object} e Event object
+   *
+   * @param  {Object} e Event object
    */
   mouseMoveHandler(e) {
     const relativeX = e.clientX - this.canvas.offsetLeft;
@@ -172,7 +172,7 @@ export default class BreakoutComponent extends Component {
 
   /**
    * Draw the game ball
-   * 
+   *
    * @param  {!Object} ctx The 2d context of the canvas
    * @param  {!Number} radius Radius for the game ball
    * @param  {!String} fillStyle Ball fill style
@@ -187,7 +187,7 @@ export default class BreakoutComponent extends Component {
 
   /**
    * Draw the game paddle
-   * 
+   *
    * @param  {!Object} ctx The 2d context of the canvas (this.ctx)
    * @param  {!Number} width Paddle width in pixels
    * @param  {!Number} height Paddle height in pixels
@@ -195,15 +195,10 @@ export default class BreakoutComponent extends Component {
    */
   drawPaddle(ctx, width, height, fillStyle) {
     ctx.beginPath();
-    ctx.rect(
-      this.paddleX,
-      this.canvas.height - height,
-      width,
-      height
-    );
-    this.ctx.fillStyle = fillStyle;
-    this.ctx.fill();
-    this.ctx.closePath();
+    ctx.rect(this.paddleX, this.canvas.height - height, width, height);
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+    ctx.closePath();
   }
 
   /**

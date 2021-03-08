@@ -3,6 +3,7 @@ import Component from '@glimmer/component';
 
 // import classes
 import { Canvas } from '../lib/canvas'
+import { Paddle } from '../lib/paddle';
 
 
   
@@ -13,9 +14,6 @@ export default class BreakoutComponent extends Component {
 
   // Use this style if not specified in component args
   defaultFillStyle = '#0095DD';
-
-  // paddle height is fixed
-  paddleHeight = 10;
 
   // bricks
   brickWidth = 75;
@@ -35,14 +33,16 @@ export default class BreakoutComponent extends Component {
   constructor() {
     super(...arguments);
 
-    // set canvas width and height
+    // set canvas width and height in template
     this.width = this.args.width ?? 480;
     this.height = this.args.height ?? 320;
 
-    // paddle width
-    this.paddleWidth = this.args.paddleWidth ?? 75;
-    this.paddleFillStyle = this.args.paddleFillStyle ?? this.defaultFillStyle;
+    // create a new paddle - default height is 10 pixels
+    this.paddle = new Paddle(10 , this.defaultFillStyle);
 
+     // default paddle width is 75 pixels
+    this.paddle.width = this.args.paddleWidth ?? 75;
+   
     // the brick wall
     this.brickRowCount = this.args.brickRowCount ?? 3;
     this.brickColumnCount = this.args.brickColumnCount ?? 5;
@@ -51,6 +51,7 @@ export default class BreakoutComponent extends Component {
     this.ballRadius = this.args.ballRadius ?? 10;
     this.ballFillStyle = this.args.ballFillStyle ?? this.defaultFillStyle;
 
+    // How many lives does this cat have?
     this.lives = this.args.lives ?? 3;
   }
 
@@ -61,9 +62,12 @@ export default class BreakoutComponent extends Component {
     this.x = this.canvas.width / 2;
     this.y = this.canvas.height - 30;
 
-    // paddle
-    this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
-    this.drawPaddle(this.canvas, this.paddleWidth, this.paddleHeight, this.paddleFillStyle);
+    // intial paddle x position
+    this.paddleX = (this.canvas.width - this.paddle.width) / 2;
+
+    // destructure this.paddle gets to keep drawPaddle short
+    const { width, height, fillStyle } = this.paddle;
+    this.drawPaddle(this.canvas, width, height, fillStyle );
 
     // bricks
     this.createBricks(this.bricks, this.brickRowCount, this.brickColumnCount);
@@ -136,11 +140,9 @@ export default class BreakoutComponent extends Component {
    * @param  {Object} e Event object
    */
   mouseMoveHandler(e) {
-    // the event handler sees the Canvas class not the instanzites variable this.canvas
-    // this allows access to the canvas and component class properties
-    const relativeX = e.clientX - this.canvas.canvasElement.offsetLeft;
+    const relativeX = e.clientX - this.canvas.offsetLeft;
     if (relativeX > 0 && relativeX < this.canvas.width) {
-      this.paddleX = relativeX - this.paddleWidth / 2;
+      this.paddleX = relativeX - this.paddle.width / 2;
     }
   }
 
@@ -229,7 +231,11 @@ export default class BreakoutComponent extends Component {
     this.canvas.clearCanvas();
     this.drawBricks(this.canvas);
     this.drawBall(this.canvas, this.ballRadius, this.ballFillStyle);
-    this.drawPaddle(this.canvas, this.paddleWidth, this.paddleHeight, this.paddleFillStyle);
+
+    // destructure this.paddle gets to keep drawPaddle "clean"
+    const { width, height, fillStyle } = this.paddle;
+    this.drawPaddle(this.canvas, width, height, fillStyle);
+
     this.collisionDetection();
 
     if (
@@ -243,7 +249,7 @@ export default class BreakoutComponent extends Component {
     if (this.y + this.dy < this.ballRadius) {
       this.dy = -this.dy;
     } else if (this.y + this.dy > this.canvas.height - this.ballRadius) {
-      if (this.x > this.paddleX && this.x < this.paddleX + this.paddleWidth) {
+      if (this.x > this.paddleX && this.x < this.paddleX + this.paddle.width) {
         this.dy = -this.dy;
       } else {
         set(this, 'lives', this.lives - 1);
@@ -259,14 +265,14 @@ export default class BreakoutComponent extends Component {
           this.y = this.canvas.height - 30;
           this.dx = 2;
           this.dy = -2;
-          this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+          this.paddleX = (this.canvas.width - this.paddle.width) / 2;
         }
       }
     }
 
     if (
       this.rightPressed &&
-      this.paddleX < this.canvas.width - this.paddleWidth
+      this.paddleX < this.canvas.width - this.paddle.width
     ) {
       this.paddleX += 7;
     } else if (this.leftPressed && this.paddleX > 0) {

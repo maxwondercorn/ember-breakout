@@ -6,6 +6,8 @@ export default class BreakoutComponent extends Component {
   dx = 2;
   dy = -2;
 
+  defaultFillStyle = '#0095DD';
+
   // paddle height is fixed
   paddleHeight = 10;
 
@@ -32,12 +34,16 @@ export default class BreakoutComponent extends Component {
 
     // paddle width
     this.paddleWidth = this.args.paddleWidth ?? 75;
+    this.paddleFillStyle = this.args.paddleFillStyle ?? this.defaultFillStyle;
 
     // the brick wall
     this.brickRowCount = this.args.brickRowCount ?? 3;
     this.brickColumnCount = this.args.brickColumnCount ?? 5;
+    this.brickFillStyle = this.args.brickFillStyle ?? this.defaultFillStyle;
 
     this.ballRadius = this.args.ballRadius ?? 10;
+    this.ballFillStyle = this.args.ballFillStyle ?? this.defaultFillStyle;
+
     this.lives = this.args.lives ?? 3;
   }
 
@@ -164,7 +170,7 @@ export default class BreakoutComponent extends Component {
   drawBall(radius) {
     this.ctx.beginPath();
     this.ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
-    this.ctx.fillStyle = '#0095DD';
+    this.ctx.fillStyle = this.ballFillStyle;
     this.ctx.fill();
     this.ctx.closePath();
   }
@@ -180,7 +186,7 @@ export default class BreakoutComponent extends Component {
       this.paddleWidth,
       this.paddleHeight
     );
-    this.ctx.fillStyle = '#0095DD';
+    this.ctx.fillStyle = this.paddleFillStyle;
     this.ctx.fill();
     this.ctx.closePath();
   }
@@ -200,7 +206,7 @@ export default class BreakoutComponent extends Component {
           this.bricks[row][col].y = brickY;
           this.ctx.beginPath();
           this.ctx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
-          this.ctx.fillStyle = '#0095DD';
+          this.ctx.fillStyle = this.brickFillStyle;
           this.ctx.fill();
           this.ctx.closePath();
         }

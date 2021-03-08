@@ -34,8 +34,8 @@ export default class BreakoutComponent extends Component {
     this.paddleWidth = this.args.paddleWidth ?? 75;
 
     // the brick wall
-    this.brickRowCount = 5;
-    this.brickColumnCount = 3;
+    this.brickRowCount = this.args.brickRowCount ?? 3;
+    this.brickColumnCount = this.args.brickColumnCount ?? 5;
 
     this.ballRadius = this.args.ballRadius ?? 10;
     this.lives = this.args.lives ?? 3;
@@ -73,10 +73,10 @@ export default class BreakoutComponent extends Component {
   }
 
   createBricks() {
-    for (let col = 0; col < this.brickColumnCount; col++) {
-      this.bricks[col] = [];
-      for (let row = 0; row < this.brickRowCount; row++) {
-        this.bricks[col][row] = { x: 0, y: 0, status: 1 };
+    for (let row = 0; row < this.brickRowCount; row++) {
+      this.bricks[row] = [];
+      for (let col = 0; col < this.brickColumnCount; col++) {
+        this.bricks[row][col] = { x: 0, y: 0, status: 1 };
       }
     }
   }
@@ -108,9 +108,9 @@ export default class BreakoutComponent extends Component {
   }
 
   collisionDetection() {
-    for (let col = 0; col < this.brickColumnCount; col++) {
-      for (let row = 0; row < this.brickRowCount; row++) {
-        let brick = this.bricks[col][row];
+    for (let row = 0; row < this.brickRowCount; row++) {
+      for (let col = 0; col < this.brickColumnCount; col++) {
+        let brick = this.bricks[row][col];
         if (brick.status == 1) {
           if (
             this.x > brick.x &&
@@ -156,15 +156,15 @@ export default class BreakoutComponent extends Component {
   }
 
   drawBricks() {
-    for (let col = 0; col < this.brickColumnCount; col++) {
-      for (let row = 0; row < this.brickRowCount; row++) {
-        if (this.bricks[col][row].status == 1) {
+    for (let row = 0; row < this.brickRowCount; row++) {
+      for (let col = 0; col < this.brickColumnCount; col++) {
+        if (this.bricks[row][col].status == 1) {
           let brickX =
-            row * (this.brickWidth + this.brickPadding) + this.brickOffsetLeft;
+            col * (this.brickWidth + this.brickPadding) + this.brickOffsetLeft;
           let brickY =
-            col * (this.brickHeight + this.brickPadding) + this.brickOffsetTop;
-          this.bricks[col][row].x = brickX;
-          this.bricks[col][row].y = brickY;
+            row * (this.brickHeight + this.brickPadding) + this.brickOffsetTop;
+          this.bricks[row][col].x = brickX;
+          this.bricks[row][col].y = brickY;
           this.ctx.beginPath();
           this.ctx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
           this.ctx.fillStyle = '#0095DD';

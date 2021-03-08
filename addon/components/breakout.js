@@ -237,7 +237,7 @@ export default class BreakoutComponent extends Component {
         // this.lives--;
 
         if (!this.lives) {
-          // alert('GAME OVER');
+          alert('GAME OVER');
           document.location.reload();
         } else {
           this.x = this.canvas.width / 2;

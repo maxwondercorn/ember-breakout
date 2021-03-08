@@ -1,6 +1,87 @@
 import { action, set } from '@ember/object';
 import Component from '@glimmer/component';
 
+  /**
+   * Creates a new Canvas
+   * @class
+   * @classdesc Handles working with canvas element and 2d context
+   **/
+class Canvas {
+  /**
+   * Create a Canvas
+   * @param  {!Element} canvas Canvas dom element
+   */
+  constructor(canvas) {
+    this.canvasElement = canvas;
+    this.canvasCtx = this.canvasElement.getContext('2d');
+  }
+
+  /**
+   * Get the canvas element
+   * @return {element} The canvas element
+   */
+  get canvas() {
+    return this.canvasElement;
+  }
+
+  /**
+   * Get the canvas 2d context
+   * @return {context} The canvas 2d context
+   */
+  get ctx() {
+    return this.canvasCtx;
+  }
+
+  /**
+   * Get the canvas width
+   * @return {number} The canvas's width
+   */
+  get width() {
+    return this.canvasElement.width;
+  }
+
+  /**
+   * Get the canvas height
+   * 
+   */
+  get height() {
+    return this.canvasElement.height;
+  }
+
+  /**
+   * Draw a circle with canvas 2D context
+   * 
+   * @param  {!Number} x Circle center x corridinate
+   * @param  {!Number} y Circle center y coordinate
+   * @param  {!Number} radius Circle radius
+   * @param  {!Number} fillStyle Circle fill style
+   */
+  drawCircle(x, y, radius, fillStyle) {
+    this.canvasCtx.beginPath();
+    this.canvasCtx.arc(x, y, radius, 0, Math.PI * 2);
+    this.canvasCtx.fillStyle = fillStyle;
+    this.canvasCtx.fill();
+    this.canvasCtx.closePath();
+  }
+
+  /**
+   * Draw a rectangle with canvas 2D context
+   * 
+   * @param  {!Number} x1 First X coordinate
+   * @param  {!Number} y1 First Y coordinate
+   * @param  {!Number} x2 Second X coordinate
+   * @param  {!Number} y2 Second Y coordinate
+   * @param  {!String} fillStyle Rectangle fill style
+   */
+  drawRec(x1, y1, x2, y2, fillStyle) {
+    this.canvasCtx.beginPath();
+    this.canvasCtx.rect(x1, y1, x2, y2);
+    this.canvasCtx.fillStyle = fillStyle;
+    this.canvasCtx.fill();
+    this.canvasCtx.closePath();
+  }
+}
+
 export default class BreakoutComponent extends Component {
   // delta x and y for keypresses
   dx = 2;
@@ -50,19 +131,18 @@ export default class BreakoutComponent extends Component {
 
   @action
   initGame(element) {
-    this.canvas = element;
-    this.ctx = element.getContext('2d');
+    this.canvas = new Canvas(element);
 
     this.x = this.canvas.width / 2;
     this.y = this.canvas.height - 30;
 
     // paddle
     this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
-    this.drawPaddle(this.ctx, this.paddleWidth, this.paddleHeight, this.paddleFillStyle);
+    this.drawPaddle(this.canvas, this.paddleWidth, this.paddleHeight, this.paddleFillStyle);
 
     // bricks
     this.createBricks(this.bricks, this.brickRowCount, this.brickColumnCount);
-    this.drawBricks();
+    this.drawBricks(this.canvas);
 
     // event listeners
     document.addEventListener('keydown', this.keyDownHandler.bind(this), false);
@@ -82,7 +162,7 @@ export default class BreakoutComponent extends Component {
   }
 
   /**
-   * Initializes the bricks array
+   * Initializes the 2 dimenstional bricks array (bricks[rows][columns])
    *
    * @param  {!Array} bricks this.bricks
    * @param  {!Number} rows Number of brick rows
@@ -131,7 +211,9 @@ export default class BreakoutComponent extends Component {
    * @param  {Object} e Event object
    */
   mouseMoveHandler(e) {
-    const relativeX = e.clientX - this.canvas.offsetLeft;
+    // the event handler sees the Canvas class not the instanzites variable this.canvas
+    // this allows access to the canvas and component class properties
+    const relativeX = e.clientX - this.canvas.canvasElement.offsetLeft;
     if (relativeX > 0 && relativeX < this.canvas.width) {
       this.paddleX = relativeX - this.paddleWidth / 2;
     }
@@ -177,12 +259,8 @@ export default class BreakoutComponent extends Component {
    * @param  {!Number} radius Radius for the game ball
    * @param  {!String} fillStyle Ball fill style
    */
-  drawBall(ctx, radius, fillStyle) {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = fillStyle;
-    ctx.fill();
-    ctx.closePath();
+  drawBall(canvas, radius, fillStyle) {
+    canvas.drawCircle(this.x, this.y, radius, fillStyle);
   }
 
   /**
@@ -193,18 +271,14 @@ export default class BreakoutComponent extends Component {
    * @param  {!Number} height Paddle height in pixels
    * @param  {!String} fillStyle Paddle fill style
    */
-  drawPaddle(ctx, width, height, fillStyle) {
-    ctx.beginPath();
-    ctx.rect(this.paddleX, this.canvas.height - height, width, height);
-    ctx.fillStyle = fillStyle;
-    ctx.fill();
-    ctx.closePath();
+  drawPaddle(canvas, width, height, fillStyle) {
+    canvas.drawRec(this.paddleX, canvas.height - height, width, height, fillStyle);
   }
 
   /**
    * Draw the field of bricks
    */
-  drawBricks() {
+  drawBricks(canvas) {
     for (let row = 0; row < this.brickRowCount; row++) {
       for (let col = 0; col < this.brickColumnCount; col++) {
         if (this.bricks[row][col].status == 1) {
@@ -214,11 +288,7 @@ export default class BreakoutComponent extends Component {
             row * (this.brickHeight + this.brickPadding) + this.brickOffsetTop;
           this.bricks[row][col].x = brickX;
           this.bricks[row][col].y = brickY;
-          this.ctx.beginPath();
-          this.ctx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
-          this.ctx.fillStyle = this.brickFillStyle;
-          this.ctx.fill();
-          this.ctx.closePath();
+          canvas.drawRec(brickX, brickY, this.brickWidth, this.brickHeight, this.brickFillStyle);
         }
       }
     }
@@ -229,10 +299,15 @@ export default class BreakoutComponent extends Component {
    * Start playing the game
    */
   newGame() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawBricks();
-    this.drawBall(this.ctx, this.ballRadius, this.ballFillStyle);
-    this.drawPaddle(this.ctx, this.paddleWidth, this.paddleHeight, this.paddleFillStyle);
+    this.canvas.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawBricks(this.canvas);
+    this.drawBall(this.canvas, this.ballRadius, this.ballFillStyle);
+    this.drawPaddle(
+      this.canvas,
+      this.paddleWidth,
+      this.paddleHeight,
+      this.paddleFillStyle
+    );
     this.collisionDetection();
 
     if (

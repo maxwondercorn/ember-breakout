@@ -1,10 +1,10 @@
-  /**
-   * Creates a new Canvas
-   * @class
-   * @classdesc Handles working with canvas element and 2d context
-   **/
-  
-  export class Canvas {
+/**
+ * Creates a new Canvas
+ * @class
+ * @classdesc Handles working with canvas element and 2d context
+ **/
+
+export class Canvas {
   /**
    * Create a Canvas
    * @param  {!Element} canvas Canvas dom element
@@ -45,18 +45,23 @@
   get height() {
     return this.canvasElement.height;
   }
+  /**
+   * Get the canvase offsetLeft property
+   */
+  get offsetLeft() {
+    return this.canvasElement.offsetLeft;
+  }
 
-
-    /**
+  /**
    * Clears the canvas
    */
   clearCanvas() {
-    this.canvasCtx.clearRect(0, 0, this.width, this.height)
+    this.canvasCtx.clearRect(0, 0, this.width, this.height);
   }
 
   /**
    * Draw a circle with canvas 2D context
-   * 
+   *
    * @param  {!Number} x Circle center x corridinate
    * @param  {!Number} y Circle center y coordinate
    * @param  {!Number} radius Circle radius
@@ -72,7 +77,7 @@
 
   /**
    * Draw a rectangle with canvas 2D context
-   * 
+   *
    * @param  {!Number} x1 First X coordinate
    * @param  {!Number} y1 First Y coordinate
    * @param  {!Number} x2 Second X coordinate

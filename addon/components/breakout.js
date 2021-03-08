@@ -6,6 +6,7 @@ export default class BreakoutComponent extends Component {
   dx = 2;
   dy = -2;
 
+  // Use this style if not specified in component args
   defaultFillStyle = '#0095DD';
 
   // paddle height is fixed
@@ -57,10 +58,10 @@ export default class BreakoutComponent extends Component {
 
     // paddle
     this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
-    this.drawPaddle(this.ctx, this.paddleWidth, this.paddleHeight);
+    this.drawPaddle(this.ctx, this.paddleWidth, this.paddleHeight, this.paddleFillStyle);
 
     // bricks
-    this.createBricks();
+    this.createBricks(this.bricks, this.brickRowCount, this.brickColumnCount);
     this.drawBricks();
 
     // event listeners
@@ -82,12 +83,16 @@ export default class BreakoutComponent extends Component {
 
   /**
    * Initializes the bricks array
+   * 
+   * @param  {!Array} bricks this.bricks
+   * @param  {!Number} rows Number of brick rows
+   * @param  {!Number} cols Number of brick columns
    */
-  createBricks() {
-    for (let row = 0; row < this.brickRowCount; row++) {
-      this.bricks[row] = [];
-      for (let col = 0; col < this.brickColumnCount; col++) {
-        this.bricks[row][col] = { x: 0, y: 0, status: 1 };
+   createBricks(bricks, rows, cols) {
+    for (let row = 0; row < rows; row++) {
+      bricks[row] = [];
+      for (let col = 0; col < cols; col++) {
+        bricks[row][col] = { x: 0, y: 0, status: 1 };
       }
     }
   }
@@ -151,6 +156,7 @@ export default class BreakoutComponent extends Component {
 
             set(this, 'score', this.score + 1);
 
+            // convert when @tracked is used
             // this.score++;
             if (this.score == this.brickRowCount * this.brickColumnCount) {
               alert('YOU WIN, CONGRATS!');
@@ -166,27 +172,36 @@ export default class BreakoutComponent extends Component {
 
   /**
    * Draw the game ball
+   * 
+   * @param  {!Object} ctx The 2d context of the canvas
+   * @param  {!Number} radius Radius for the game ball
+   * @param  {!String} fillStyle Ball fill style
    */
-  drawBall(radius) {
-    this.ctx.beginPath();
-    this.ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
-    this.ctx.fillStyle = this.ballFillStyle;
-    this.ctx.fill();
-    this.ctx.closePath();
+  drawBall(ctx, radius, fillStyle) {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+    ctx.closePath();
   }
 
   /**
    * Draw the game paddle
+   * 
+   * @param  {!Object} ctx The 2d context of the canvas (this.ctx)
+   * @param  {!Number} width Paddle width in pixels
+   * @param  {!Number} height Paddle height in pixels
+   * @param  {!String} fillStyle Paddle fill style
    */
-  drawPaddle() {
-    this.ctx.beginPath();
-    this.ctx.rect(
+  drawPaddle(ctx, width, height, fillStyle) {
+    ctx.beginPath();
+    ctx.rect(
       this.paddleX,
-      this.canvas.height - this.paddleHeight,
-      this.paddleWidth,
-      this.paddleHeight
+      this.canvas.height - height,
+      width,
+      height
     );
-    this.ctx.fillStyle = this.paddleFillStyle;
+    this.ctx.fillStyle = fillStyle;
     this.ctx.fill();
     this.ctx.closePath();
   }
@@ -221,8 +236,8 @@ export default class BreakoutComponent extends Component {
   newGame() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawBricks();
-    this.drawBall(this.ballRadius);
-    this.drawPaddle();
+    this.drawBall(this.ctx, this.ballRadius, this.ballFillStyle);
+    this.drawPaddle(this.ctx, this.paddleWidth, this.paddleHeight, this.paddleFillStyle);
     this.collisionDetection();
 
     if (
@@ -240,6 +255,8 @@ export default class BreakoutComponent extends Component {
         this.dy = -this.dy;
       } else {
         set(this, 'lives', this.lives - 1);
+
+        // convert when @tracked is used
         // this.lives--;
 
         if (!this.lives) {

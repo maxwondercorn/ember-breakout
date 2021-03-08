@@ -67,6 +67,7 @@ export default class BreakoutComponent extends Component {
   }
 
   willDestroy() {
+    super.willDestroy(...arguments);
     document.removeEventListener('keydown', this.keyDownHandler);
     document.removeEventListener('keyup', this.keyUpHandler);
     document.removeEventListener('mousemove', this.mouseMoveHandler);

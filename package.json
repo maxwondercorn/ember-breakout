@@ -1,7 +1,7 @@
 {
   "name": "ember-breakout",
   "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
+  "description": "Simple 2D breakout game to be used as an easter egg",
   "keywords": [
     "ember-addon",
     "breakout",
@@ -17,6 +17,7 @@
   },
   "scripts": {
     "build": "ember build --environment=production",
+    "licenses": "legally > LEGALLY",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
@@ -55,6 +56,7 @@
     "eslint": "^7.5.0",
     "eslint-plugin-ember": "^8.9.1",
     "eslint-plugin-node": "^11.1.0",
+    "legally": "^3.5.10",
     "loader.js": "^4.7.0",
     "npm-run-all": "^4.1.5",
     "qunit-dom": "^1.2.0"
@@ -66,6 +68,7 @@
     "edition": "octane"
   },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "demoURL": "https://maxwondercorn.github.io/ember-breakout/"
   }
 }

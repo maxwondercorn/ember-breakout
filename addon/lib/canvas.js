@@ -10,8 +10,8 @@ export class Canvas {
    * @param  {!Element} canvas Canvas dom element
    */
   constructor(canvas) {
-    this.canvasElement = canvas;
-    this.canvasCtx = this.canvasElement.getContext('2d');
+    this.element = canvas;
+    this.canvasCtx = this.element.getContext('2d');
   }
 
   /**
@@ -19,7 +19,7 @@ export class Canvas {
    * @return {element} The canvas element
    */
   get canvas() {
-    return this.canvasElement;
+    return this.element;
   }
 
   /**
@@ -35,7 +35,7 @@ export class Canvas {
    * @return {number} The canvas's width
    */
   get width() {
-    return this.canvasElement.width;
+    return this.element.width;
   }
 
   /**
@@ -43,13 +43,13 @@ export class Canvas {
    * @return {number} The canvas's height
    */
   get height() {
-    return this.canvasElement.height;
+    return this.element.height;
   }
   /**
    * Get the canvase offsetLeft property
    */
   get offsetLeft() {
-    return this.canvasElement.offsetLeft;
+    return this.element.offsetLeft;
   }
 
   /**

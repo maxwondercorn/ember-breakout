@@ -84,11 +84,8 @@ export default class BreakoutComponent extends Component {
    * @param  {Object} e Event object
    */
   keyDownHandler(e) {
-    if (e.code == 'ArrowRight') {
-      this.rightPressed = true;
-    } else if (e.code == 'ArrowLeft') {
-      this.leftPressed = true;
-    }
+    if (e.code == 'ArrowRight') this.rightPressed = true;
+    else if (e.code == 'ArrowLeft') this.leftPressed = true;
   }
 
   /**
@@ -97,11 +94,8 @@ export default class BreakoutComponent extends Component {
    * @param  {Object} e Event object
    */
   keyUpHandler(e) {
-    if (e.code == 'ArrowRight') {
-      this.rightPressed = false;
-    } else if (e.code == 'ArrowLeft') {
-      this.leftPressed = false;
-    }
+    if (e.code == 'ArrowRight') this.rightPressed = false;
+    else if (e.code == 'ArrowLeft') this.leftPressed = false;
   }
 
   /**
@@ -123,7 +117,7 @@ export default class BreakoutComponent extends Component {
     for (let row = 0; row < this.bricks.rowCount; row++) {
       for (let col = 0; col < this.bricks.colCount; col++) {
         let brick = this.bricks.brick(row, col);
-        
+
         if (brick.status == 1) {
           if (
             this.x > brick.x &&
@@ -138,6 +132,7 @@ export default class BreakoutComponent extends Component {
 
             // convert when @tracked is used
             // this.score++;
+
             if (this.score == this.bricks.rowCount * this.bricks.colCount) {
               alert('YOU WIN, CONGRATS!');
               document.location.reload();

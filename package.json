@@ -1,6 +1,6 @@
 {
   "name": "ember-breakout",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Simple 2D breakout game to be used as an easter egg",
   "keywords": [
     "ember-addon",

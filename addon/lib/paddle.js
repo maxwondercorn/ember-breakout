@@ -11,7 +11,7 @@ export class Paddle {
    * @param  {!Number} height Paddle height in pixels
    * @param  {!String} style Paddle color
    */
-  constructor(height, style) {
+  constructor(height, style = '#0095DD') {
     this.height = height;
     this.style = style;
   }

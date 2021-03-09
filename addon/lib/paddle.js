@@ -1,55 +1,34 @@
 /**
- * Creates a new Paddle
+ * Creates a new Canvas
  * @class
- * @classdesc
+ * @classdesc Manages paddle properties and drawing
  **/
 
 export class Paddle {
   /**
    * Create a Paddle
-   * 
+   *
    * @param  {!Number} height Paddle height in pixels
    * @param  {!String} style Paddle color
    */
   constructor(height, style) {
-    this.padHeight = height;
-    this.padStyle = style;
+    this.height = height;
+    this.style = style;
   }
+  
   /**
-   * Get paddle height
-   */
-  get height() {
-    return this.padHeight;
-  }
- 
-  /**
-   * Set paddle width
+   * Draws the paddle
    * 
-   * @param  {!Number} width Paddle width in pixels
+   * @param  {!Element} canvas Game canvas element
+   * @param  {} paddleX Current paddle X positon
    */
-  set width(width) {
-    this.padWidth = width;
-  }
- 
-  /**
-   * Get paddle width
-   */
-  get width() {
-    return this.padWidth;
-  }
- 
-  /**
-   * Set paddle fill sytle
-   * @param  {!string} style Paddle color
-   */
-  set fillStyle(style) {
-    this.padStyle = style;
-  }
- 
-  /**
-   * Get paddle fill style
-   */
-  get fillStyle() {
-    return this.padStyle;
+  draw(canvas, paddleX) {
+    canvas.drawRec(
+      paddleX,
+      canvas.height - this.height,
+      this.width,
+      this.height,
+      this.style
+    );
   }
 }

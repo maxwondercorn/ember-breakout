@@ -42,7 +42,7 @@ export default class BreakoutComponent extends Component {
 
      // default paddle width is 75 pixels
     this.paddle.width = this.args.paddleWidth ?? 75;
-   
+
     // the brick wall
     this.brickRowCount = this.args.brickRowCount ?? 3;
     this.brickColumnCount = this.args.brickColumnCount ?? 5;
@@ -62,12 +62,9 @@ export default class BreakoutComponent extends Component {
     this.x = this.canvas.width / 2;
     this.y = this.canvas.height - 30;
 
-    // intial paddle x position
+    // intial paddle x position and draw it
     this.paddleX = (this.canvas.width - this.paddle.width) / 2;
-
-    // destructure this.paddle gets to keep drawPaddle short
-    const { width, height, fillStyle } = this.paddle;
-    this.drawPaddle(this.canvas, width, height, fillStyle );
+    this.paddle.draw(this.canvas, this.paddleX);
 
     // bricks
     this.createBricks(this.bricks, this.brickRowCount, this.brickColumnCount);
@@ -191,18 +188,6 @@ export default class BreakoutComponent extends Component {
   }
 
   /**
-   * Draw the game paddle
-   *
-   * @param  {!Object} canvas Instance of Canvas class
-   * @param  {!Number} width Paddle width in pixels
-   * @param  {!Number} height Paddle height in pixels
-   * @param  {!String} fillStyle Paddle fill style
-   */
-  drawPaddle(canvas, width, height, fillStyle) {
-    canvas.drawRec(this.paddleX, canvas.height - height, width, height, fillStyle);
-  }
-
-  /**
    * Draw the field of bricks
    * 
    * @param  {!Object} canvas Instance of Canvas class
@@ -231,10 +216,7 @@ export default class BreakoutComponent extends Component {
     this.canvas.clearCanvas();
     this.drawBricks(this.canvas);
     this.drawBall(this.canvas, this.ballRadius, this.ballFillStyle);
-
-    // destructure this.paddle gets to keep drawPaddle "clean"
-    const { width, height, fillStyle } = this.paddle;
-    this.drawPaddle(this.canvas, width, height, fillStyle);
+    this.paddle.draw(this.canvas, this.paddleX);
 
     this.collisionDetection();
 

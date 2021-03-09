@@ -75,8 +75,15 @@
   },
   "auto-changelog": {
     "output": "CHANGELOG.md",
-    "unreleased": true,
+    "template": "changelog.hbs",
     "commitLimit": false,
-    "sortCommits": "date"
+    "sortCommits": "date",
+    "replaceText": {
+      "(fix): ": "FIX: ",
+      "(feat): ": "FEAT: ",
+      "(chore):": "CHORE: ",
+      "(doc):": "DOC:",
+      "(refactor):": "REFACTOR:"
+    }
   }
 }

@@ -1,67 +1,66 @@
 import { action, set } from '@ember/object';
 import Component from '@glimmer/component';
 
+// import classes
+import { Canvas } from '../lib/canvas';
+import { Paddle } from '../lib/paddle';
+import { Brick } from '../lib/brick';
+
 export default class BreakoutComponent extends Component {
-  // delta x and y for keypresses
+  // ball movement delta x and y
   dx = 2;
   dy = -2;
 
-  defaultFillStyle = '#0095DD';
-
-  // paddle height is fixed
-  paddleHeight = 10;
-
-  // bricks
-  brickWidth = 75;
-  brickHeight = 20;
-  brickPadding = 10;
-  brickOffsetTop = 30;
-  brickOffsetLeft = 30;
+  // Use this style if not specified in component args
+  // defaultFillStyle = '#0095DD';
 
   score = 0;
 
-  bricks = [];
-
+  // left or right arrow key pressed
   rightPressed = false;
   leftPressed = false;
 
   constructor() {
     super(...arguments);
 
-    // set canvas width and height
+    // set canvas width and height in template
     this.width = this.args.width ?? 480;
     this.height = this.args.height ?? 320;
 
-    // paddle width
-    this.paddleWidth = this.args.paddleWidth ?? 75;
-    this.paddleFillStyle = this.args.paddleFillStyle ?? this.defaultFillStyle;
+    // create a new paddle - default height is 10 pixels
+    this.paddle = new Paddle(10, this.defaultFillStyle);
+
+    // default paddle width is 75 pixels
+    this.paddle.width = this.args.paddleWidth ?? 75;
 
     // the brick wall
-    this.brickRowCount = this.args.brickRowCount ?? 3;
-    this.brickColumnCount = this.args.brickColumnCount ?? 5;
-    this.brickFillStyle = this.args.brickFillStyle ?? this.defaultFillStyle;
+    this.bricks = new Brick(20, this.args.brickFillStyle);
+    this.bricks.width = this.args.brickWidth ?? 75;
+    this.bricks.rowCount = this.args.brickRowCount ?? 3;
+    this.bricks.colCount = this.args.brickColumnCount ?? 5;
 
+    // the game ball
     this.ballRadius = this.args.ballRadius ?? 10;
     this.ballFillStyle = this.args.ballFillStyle ?? this.defaultFillStyle;
 
+    // How many lives does this cat have?
     this.lives = this.args.lives ?? 3;
   }
 
   @action
   initGame(element) {
-    this.canvas = element;
-    this.ctx = element.getContext('2d');
+    this.canvas = new Canvas(element);
 
     this.x = this.canvas.width / 2;
     this.y = this.canvas.height - 30;
 
-    // paddle
-    this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
-    this.drawPaddle(this.ctx, this.paddleWidth, this.paddleHeight);
+    // intial paddle x position and draw it
+    this.paddleX = (this.canvas.width - this.paddle.width) / 2;
+    this.paddle.draw(this.canvas, this.paddleX);
 
     // bricks
-    this.createBricks();
-    this.drawBricks();
+    this.bricks.create();
+    this.bricks.draw(this.canvas);
 
     // event listeners
     document.addEventListener('keydown', this.keyDownHandler.bind(this), false);
@@ -80,23 +79,11 @@ export default class BreakoutComponent extends Component {
     document.removeEventListener('mousemove', this.mouseMoveHandler);
   }
 
-  /**
-   * Initializes the bricks array
-   */
-  createBricks() {
-    for (let row = 0; row < this.brickRowCount; row++) {
-      this.bricks[row] = [];
-      for (let col = 0; col < this.brickColumnCount; col++) {
-        this.bricks[row][col] = { x: 0, y: 0, status: 1 };
-      }
-    }
-  }
-
   // ****** Event listners for game play ******
 
   /**
    * Keydown event listener
-   * 
+   *
    * @param  {Object} e Event object
    */
   keyDownHandler(e) {
@@ -109,7 +96,7 @@ export default class BreakoutComponent extends Component {
 
   /**
    * keyup event handler
-   * 
+   *
    * @param  {Object} e Event object
    */
   keyUpHandler(e) {
@@ -122,13 +109,13 @@ export default class BreakoutComponent extends Component {
 
   /**
    * mouse move event handler
-   * 
-    * @param  {Object} e Event object
+   *
+   * @param  {Object} e Event object
    */
   mouseMoveHandler(e) {
     const relativeX = e.clientX - this.canvas.offsetLeft;
     if (relativeX > 0 && relativeX < this.canvas.width) {
-      this.paddleX = relativeX - this.paddleWidth / 2;
+      this.paddleX = relativeX - this.paddle.width / 2;
     }
   }
 
@@ -136,23 +123,25 @@ export default class BreakoutComponent extends Component {
    * Detects when the ball strikes a brick and adjusts the score
    */
   collisionDetection() {
-    for (let row = 0; row < this.brickRowCount; row++) {
-      for (let col = 0; col < this.brickColumnCount; col++) {
-        let brick = this.bricks[row][col];
+    for (let row = 0; row < this.bricks.rowCount; row++) {
+      for (let col = 0; col < this.bricks.colCount; col++) {
+        let brick = this.bricks.brick(row, col);
+        
         if (brick.status == 1) {
           if (
             this.x > brick.x &&
-            this.x < brick.x + this.brickWidth &&
+            this.x < brick.x + this.bricks.width &&
             this.y > brick.y &&
-            this.y < brick.y + this.brickHeight
+            this.y < brick.y + this.bricks.height
           ) {
             this.dy = -this.dy;
             brick.status = 0;
 
             set(this, 'score', this.score + 1);
 
+            // convert when @tracked is used
             // this.score++;
-            if (this.score == this.brickRowCount * this.brickColumnCount) {
+            if (this.score == this.bricks.rowCount * this.bricks.colCount) {
               alert('YOU WIN, CONGRATS!');
               document.location.reload();
             }
@@ -162,56 +151,15 @@ export default class BreakoutComponent extends Component {
     }
   }
 
-  // ****** Game elements ******
-
   /**
    * Draw the game ball
+   *
+   * @param  {!Object} canvas Instance of Canvas class
+   * @param  {!Number} radius Radius for the game ball
+   * @param  {!String} fillStyle Ball fill style
    */
-  drawBall(radius) {
-    this.ctx.beginPath();
-    this.ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
-    this.ctx.fillStyle = this.ballFillStyle;
-    this.ctx.fill();
-    this.ctx.closePath();
-  }
-
-  /**
-   * Draw the game paddle
-   */
-  drawPaddle() {
-    this.ctx.beginPath();
-    this.ctx.rect(
-      this.paddleX,
-      this.canvas.height - this.paddleHeight,
-      this.paddleWidth,
-      this.paddleHeight
-    );
-    this.ctx.fillStyle = this.paddleFillStyle;
-    this.ctx.fill();
-    this.ctx.closePath();
-  }
-
-  /**
-   * Draw the field of bricks
-   */
-  drawBricks() {
-    for (let row = 0; row < this.brickRowCount; row++) {
-      for (let col = 0; col < this.brickColumnCount; col++) {
-        if (this.bricks[row][col].status == 1) {
-          let brickX =
-            col * (this.brickWidth + this.brickPadding) + this.brickOffsetLeft;
-          let brickY =
-            row * (this.brickHeight + this.brickPadding) + this.brickOffsetTop;
-          this.bricks[row][col].x = brickX;
-          this.bricks[row][col].y = brickY;
-          this.ctx.beginPath();
-          this.ctx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
-          this.ctx.fillStyle = this.brickFillStyle;
-          this.ctx.fill();
-          this.ctx.closePath();
-        }
-      }
-    }
+  drawBall(canvas, radius, fillStyle) {
+    canvas.drawCircle(this.x, this.y, radius, fillStyle);
   }
 
   @action
@@ -219,10 +167,11 @@ export default class BreakoutComponent extends Component {
    * Start playing the game
    */
   newGame() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawBricks();
-    this.drawBall(this.ballRadius);
-    this.drawPaddle();
+    this.canvas.clearCanvas();
+    this.bricks.draw(this.canvas);
+    this.drawBall(this.canvas, this.ballRadius, this.ballFillStyle);
+    this.paddle.draw(this.canvas, this.paddleX);
+
     this.collisionDetection();
 
     if (
@@ -236,10 +185,12 @@ export default class BreakoutComponent extends Component {
     if (this.y + this.dy < this.ballRadius) {
       this.dy = -this.dy;
     } else if (this.y + this.dy > this.canvas.height - this.ballRadius) {
-      if (this.x > this.paddleX && this.x < this.paddleX + this.paddleWidth) {
+      if (this.x > this.paddleX && this.x < this.paddleX + this.paddle.width) {
         this.dy = -this.dy;
       } else {
         set(this, 'lives', this.lives - 1);
+
+        // convert when @tracked is used
         // this.lives--;
 
         if (!this.lives) {
@@ -250,14 +201,14 @@ export default class BreakoutComponent extends Component {
           this.y = this.canvas.height - 30;
           this.dx = 2;
           this.dy = -2;
-          this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+          this.paddleX = (this.canvas.width - this.paddle.width) / 2;
         }
       }
     }
 
     if (
       this.rightPressed &&
-      this.paddleX < this.canvas.width - this.paddleWidth
+      this.paddleX < this.canvas.width - this.paddle.width
     ) {
       this.paddleX += 7;
     } else if (this.leftPressed && this.paddleX > 0) {

@@ -1,7 +1,15 @@
+[![License: CC0-1.0](https://licensebuttons.net/l/zero/1.0/80x15.png)](http://creativecommons.org/publicdomain/zero/1.0/)
+
 ember-breakout
 ==============================================================================
 
-This Ember.js addon embeds a simple 2D Breakout game into your application.  The original code was created as an easter egg
+An easter egg for you Ember application! This addon is a simple breakout game that you can hide someplace in your app.
+
+See the [demo](https://maxwondercorn.github.io/ember-breakout/)
+
+The addon is based on this MDN Web Docs game development [tutorial](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript).  MDN [licenses](https://developer.mozilla.org/en-US/docs/MDN/About#copyrights_and_licenses ) their code snippets as public domain [CC0](https://creativecommons.org/publicdomain/zero/1.0/). The addon is also licensed under CC0-1.0.
+
+The GitHub repo for the tutorial can be found [here](https://github.com/end3r/Gamedev-Canvas-workshop).
 
 
 Compatibility
@@ -35,4 +43,4 @@ See the [Contributing](CONTRIBUTING.md) guide for details.
 License
 ------------------------------------------------------------------------------
 
-This project is licensed under the [MIT License](LICENSE.md).
+This project is licensed under the [CC0-1.0 License](LICENSE.md).

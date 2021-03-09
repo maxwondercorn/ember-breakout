@@ -27,6 +27,7 @@
 .gitkeep
 /CHANGELOG.md
 /.vscode
+/.github
 
 # ember-try
 /.node_modules.ember-try/

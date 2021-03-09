@@ -1,4 +1,17 @@
-[![License: CC0-1.0](https://licensebuttons.net/l/zero/1.0/80x15.png)](http://creativecommons.org/publicdomain/zero/1.0/)
+[![CC-0 license](https://img.shields.io/badge/License-CC--0-blue.svg)](https://creativecommons.org/licenses/by-nd/4.0)
+![ci workflow](https://github.com/maxwondercorn/ember-breakout/actions/workflows/ci.yml/badge.svg)
+
+[![Latest NPM release][npm-badge]][npm-badge-url]
+[![Dependencies][dependencies-badge]][dependencies-badge-url]
+[![Dev Dependencies][devdependencies-badge]][devdependencies-badge-url]
+
+[npm-badge]: https://img.shields.io/npm/v/ember-breakout.svg
+[npm-badge-url]: https://www.npmjs.com/package/ember-breakout
+
+[dependencies-badge]: https://img.shields.io/david/maxwondercorn/ember-breakout.svg
+[dependencies-badge-url]: https://david-dm.org/maxwondercorn/ember-breakout
+[devdependencies-badge]: https://img.shields.io/david/dev/maxwondercorn/ember-breakout.svg
+[devdependencies-badge-url]: https://david-dm.org/maxwondercorn/ember-breakou#info=devDependencies
 
 ember-breakout
 ==============================================================================

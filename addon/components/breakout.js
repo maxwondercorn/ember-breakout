@@ -1,87 +1,91 @@
 import { action, set } from '@ember/object';
 import Component from '@glimmer/component';
 
+// import classes
+import { Canvas } from '../lib/canvas';
+import { Paddle } from '../lib/paddle';
+import { Brick } from '../lib/brick';
+
 export default class BreakoutComponent extends Component {
-  // delta x and y for keypresses
+  // ball movement delta x and y
   dx = 2;
   dy = -2;
 
-  // paddle height is fixed
-  paddleHeight = 10;
-
-  // bricks
-  brickWidth = 75;
-  brickHeight = 20;
-  brickPadding = 10;
-  brickOffsetTop = 30;
-  brickOffsetLeft = 30;
+  // Use this style if not specified in component args
+  // defaultFillStyle = '#0095DD';
 
   score = 0;
 
-  bricks = [];
-
+  // left or right arrow key pressed
   rightPressed = false;
   leftPressed = false;
 
   constructor() {
     super(...arguments);
 
-    // set canvas width and height
+    // set canvas width and height in template
     this.width = this.args.width ?? 480;
     this.height = this.args.height ?? 320;
 
-    // paddle width
-    this.paddleWidth = this.args.paddleWidth ?? 75;
+    // create a new paddle - default height is 10 pixels
+    this.paddle = new Paddle(10, this.defaultFillStyle);
+
+    // default paddle width is 75 pixels
+    this.paddle.width = this.args.paddleWidth ?? 75;
 
     // the brick wall
-    this.brickRowCount = this.args.brickRowCount ?? 3;
-    this.brickColumnCount = this.args.brickColumnCount ?? 5;
+    this.bricks = new Brick(20, this.args.brickFillStyle);
+    this.bricks.width = this.args.brickWidth ?? 75;
+    this.bricks.rowCount = this.args.brickRowCount ?? 3;
+    this.bricks.colCount = this.args.brickColumnCount ?? 5;
 
+    // the game ball
     this.ballRadius = this.args.ballRadius ?? 10;
+    this.ballFillStyle = this.args.ballFillStyle ?? this.defaultFillStyle;
+
+    // How many lives does this cat have?
     this.lives = this.args.lives ?? 3;
   }
 
   @action
   initGame(element) {
-    this.canvas = element;
-    this.ctx = element.getContext('2d');
+    this.canvas = new Canvas(element);
 
     this.x = this.canvas.width / 2;
     this.y = this.canvas.height - 30;
-    this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
 
-    this.createBricks();
-    this.drawBricks();
+    // intial paddle x position and draw it
+    this.paddleX = (this.canvas.width - this.paddle.width) / 2;
+    this.paddle.draw(this.canvas, this.paddleX);
 
-    // this.createBricks(5, 3);
-    // this.drawBricks(this.bricks, 5, 3);
-    this.drawPaddle();
+    // bricks
+    this.bricks.create();
+    this.bricks.draw(this.canvas);
 
+    // event listeners
     document.addEventListener('keydown', this.keyDownHandler.bind(this), false);
     document.addEventListener('keyup', this.keyUpHandler.bind(this), false);
-    document.addEventListener(
-      'mousemove',
-      this.mouseMoveHandler.bind(this),
-      false
-    );
+    // prettier-ignore
+    document.addEventListener('mousemove', this.mouseMoveHandler.bind(this), false);
   }
 
+  /**
+   * Glimmer component lifecycle hook
+   */
   willDestroy() {
+    super.willDestroy(...arguments);
     document.removeEventListener('keydown', this.keyDownHandler);
     document.removeEventListener('keyup', this.keyUpHandler);
     document.removeEventListener('mousemove', this.mouseMoveHandler);
   }
 
-  createBricks() {
-    for (let row = 0; row < this.brickRowCount; row++) {
-      this.bricks[row] = [];
-      for (let col = 0; col < this.brickColumnCount; col++) {
-        this.bricks[row][col] = { x: 0, y: 0, status: 1 };
-      }
-    }
-  }
+  // ****** Event listners for game play ******
 
-  // keydown event listener
+  /**
+   * Keydown event listener
+   *
+   * @param  {Object} e Event object
+   */
   keyDownHandler(e) {
     if (e.code == 'ArrowRight') {
       this.rightPressed = true;
@@ -90,7 +94,11 @@ export default class BreakoutComponent extends Component {
     }
   }
 
-  // keyup event handler
+  /**
+   * keyup event handler
+   *
+   * @param  {Object} e Event object
+   */
   keyUpHandler(e) {
     if (e.code == 'ArrowRight') {
       this.rightPressed = false;
@@ -99,32 +107,41 @@ export default class BreakoutComponent extends Component {
     }
   }
 
-  // mouse move
+  /**
+   * mouse move event handler
+   *
+   * @param  {Object} e Event object
+   */
   mouseMoveHandler(e) {
     const relativeX = e.clientX - this.canvas.offsetLeft;
     if (relativeX > 0 && relativeX < this.canvas.width) {
-      this.paddleX = relativeX - this.paddleWidth / 2;
+      this.paddleX = relativeX - this.paddle.width / 2;
     }
   }
 
+  /**
+   * Detects when the ball strikes a brick and adjusts the score
+   */
   collisionDetection() {
-    for (let row = 0; row < this.brickRowCount; row++) {
-      for (let col = 0; col < this.brickColumnCount; col++) {
-        let brick = this.bricks[row][col];
+    for (let row = 0; row < this.bricks.rowCount; row++) {
+      for (let col = 0; col < this.bricks.colCount; col++) {
+        let brick = this.bricks.brick(row, col);
+        
         if (brick.status == 1) {
           if (
             this.x > brick.x &&
-            this.x < brick.x + this.brickWidth &&
+            this.x < brick.x + this.bricks.width &&
             this.y > brick.y &&
-            this.y < brick.y + this.brickHeight
+            this.y < brick.y + this.bricks.height
           ) {
             this.dy = -this.dy;
             brick.status = 0;
 
             set(this, 'score', this.score + 1);
 
+            // convert when @tracked is used
             // this.score++;
-            if (this.score == this.brickRowCount * this.brickColumnCount) {
+            if (this.score == this.bricks.rowCount * this.bricks.colCount) {
               alert('YOU WIN, CONGRATS!');
               document.location.reload();
             }
@@ -134,53 +151,27 @@ export default class BreakoutComponent extends Component {
     }
   }
 
-  drawBall(radius) {
-    this.ctx.beginPath();
-    this.ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
-    this.ctx.fillStyle = '#0095DD';
-    this.ctx.fill();
-    this.ctx.closePath();
-  }
-
-  drawPaddle() {
-    this.ctx.beginPath();
-    this.ctx.rect(
-      this.paddleX,
-      this.canvas.height - this.paddleHeight,
-      this.paddleWidth,
-      this.paddleHeight
-    );
-    this.ctx.fillStyle = '#0095DD';
-    this.ctx.fill();
-    this.ctx.closePath();
-  }
-
-  drawBricks() {
-    for (let row = 0; row < this.brickRowCount; row++) {
-      for (let col = 0; col < this.brickColumnCount; col++) {
-        if (this.bricks[row][col].status == 1) {
-          let brickX =
-            col * (this.brickWidth + this.brickPadding) + this.brickOffsetLeft;
-          let brickY =
-            row * (this.brickHeight + this.brickPadding) + this.brickOffsetTop;
-          this.bricks[row][col].x = brickX;
-          this.bricks[row][col].y = brickY;
-          this.ctx.beginPath();
-          this.ctx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
-          this.ctx.fillStyle = '#0095DD';
-          this.ctx.fill();
-          this.ctx.closePath();
-        }
-      }
-    }
+  /**
+   * Draw the game ball
+   *
+   * @param  {!Object} canvas Instance of Canvas class
+   * @param  {!Number} radius Radius for the game ball
+   * @param  {!String} fillStyle Ball fill style
+   */
+  drawBall(canvas, radius, fillStyle) {
+    canvas.drawCircle(this.x, this.y, radius, fillStyle);
   }
 
   @action
+  /**
+   * Start playing the game
+   */
   newGame() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawBricks();
-    this.drawBall(this.ballRadius);
-    this.drawPaddle();
+    this.canvas.clearCanvas();
+    this.bricks.draw(this.canvas);
+    this.drawBall(this.canvas, this.ballRadius, this.ballFillStyle);
+    this.paddle.draw(this.canvas, this.paddleX);
+
     this.collisionDetection();
 
     if (
@@ -194,28 +185,30 @@ export default class BreakoutComponent extends Component {
     if (this.y + this.dy < this.ballRadius) {
       this.dy = -this.dy;
     } else if (this.y + this.dy > this.canvas.height - this.ballRadius) {
-      if (this.x > this.paddleX && this.x < this.paddleX + this.paddleWidth) {
+      if (this.x > this.paddleX && this.x < this.paddleX + this.paddle.width) {
         this.dy = -this.dy;
       } else {
         set(this, 'lives', this.lives - 1);
+
+        // convert when @tracked is used
         // this.lives--;
 
         if (!this.lives) {
-          // alert('GAME OVER');
+          alert('GAME OVER');
           document.location.reload();
         } else {
           this.x = this.canvas.width / 2;
           this.y = this.canvas.height - 30;
           this.dx = 2;
           this.dy = -2;
-          this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+          this.paddleX = (this.canvas.width - this.paddle.width) / 2;
         }
       }
     }
 
     if (
       this.rightPressed &&
-      this.paddleX < this.canvas.width - this.paddleWidth
+      this.paddleX < this.canvas.width - this.paddle.width
     ) {
       this.paddleX += 7;
     } else if (this.leftPressed && this.paddleX > 0) {

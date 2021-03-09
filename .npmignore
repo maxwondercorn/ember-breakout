@@ -25,6 +25,8 @@
 /tests/
 /yarn.lock
 .gitkeep
+/CHANGELOG.md
+/.vscode
 
 # ember-try
 /.node_modules.ember-try/

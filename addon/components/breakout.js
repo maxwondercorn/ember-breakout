@@ -11,9 +11,6 @@ export default class BreakoutComponent extends Component {
   dx = 2;
   dy = -2;
 
-  // Use this style if not specified in component args
-  // defaultFillStyle = '#0095DD';
-
   score = 0;
 
   // left or right arrow key pressed
@@ -166,7 +163,7 @@ export default class BreakoutComponent extends Component {
   /**
    * Start playing the game
    */
-  newGame() {
+  playGame() {
     this.canvas.clearCanvas();
     this.bricks.draw(this.canvas);
     this.drawBall(this.canvas, this.ballRadius, this.ballFillStyle);
@@ -217,6 +214,6 @@ export default class BreakoutComponent extends Component {
 
     this.x += this.dx;
     this.y += this.dy;
-    requestAnimationFrame(this.newGame);
+    requestAnimationFrame(this.playGame);
   }
 }
